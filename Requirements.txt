@@ -1,0 +1,7 @@
+torch
+torchvision
+wandb
+opencv-python
+matplotlib
+pycocotools
+
