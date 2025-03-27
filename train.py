@@ -2,6 +2,11 @@ import random
 
 import wandb
 
+import os
+
+print("Current working directory:", os.getcwd())
+print("Contents of current directory:", os.listdir("."))
+
 # Start a new wandb run to track this script.
 run = wandb.init(
     # Set the wandb entity where your project will be logged (generally your team name).
