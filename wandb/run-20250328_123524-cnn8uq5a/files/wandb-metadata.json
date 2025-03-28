@@ -1,0 +1,16 @@
+{
+  "os":  "Windows-10-10.0.26100-SP0",
+  "python":  "CPython 3.11.9",
+  "startedAt":  "2025-03-28T12:35:24.741681Z",
+  "program":  "C:\\Users\\styli\\Desktop\\INM705_CW-2\\train.py",
+  "codePath":  "train.py",
+  "git":  {
+    "remote":  "https://github.com/StylianosIoannou/INM705_CW.git",
+    "commit":  "667e5dccfe21ad5167a88c87a78e3a8eb48c21b5"
+  },
+  "email":  "stylianos.ioannou@city.ac.uk",
+  "root":  "C:\\Users\\styli\\Desktop\\INM705_CW-2",
+  "host":  "MSI",
+  "executable":  "C:\\Users\\styli\\Desktop\\INM705_CW-2\\venv\\Scripts\\python.exe",
+  "codePathLocal":  "train.py"
+}

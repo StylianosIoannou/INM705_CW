@@ -4,11 +4,8 @@ import wandb
 
 # Start a new wandb run to track this script.
 run = wandb.init(
-    # Set the wandb entity where your project will be logged (generally your team name).
     entity="stylianos-ioannou-city-university-of-london",
-    # Set the wandb project where this run will be logged.
     project="INM705_CW",
-    # Track hyperparameters and run metadata.
     config={
         "learning_rate": 0.02,
         "architecture": "CNN",
@@ -27,7 +24,7 @@ for epoch in range(2, epochs):
     # Log metrics to wandb.
     run.log({"acc": acc, "loss": loss})
 
-# Finish the run and upload any remaining data.
+
 run.finish()
 
 import torch
@@ -35,9 +32,9 @@ from torch.utils.data import DataLoader
 from torchvision.datasets import CocoDetection
 from torchvision import transforms
 
-# Paths to your dataset
-TRAIN_IMAGES_FOLDER = './coco2017/train2017'
-TRAIN_ANNOTATIONS_FILE = './coco2017/annotations/instances_train2017.json'
+# Paths to dataset
+TRAIN_IMAGES_FOLDER = './archive/coco2017/train2017'
+TRAIN_ANNOTATIONS_FILE = './archive/coco2017/annotations/instances_train2017.json'
 
 coco_transform = transforms.Compose([transforms.ToTensor()])
 
@@ -63,7 +60,7 @@ def get_train_loader(batch_size=2):
     )
     return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
 
-# Test it
+# Test 
 if __name__ == "__main__":
     train_loader = get_train_loader(batch_size=2)
     for images, targets in train_loader:
