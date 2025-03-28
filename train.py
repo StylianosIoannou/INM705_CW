@@ -1,6 +1,9 @@
-import random
 import os
 import wandb
+import torch
+from torch.utils.data import DataLoader
+from torchvision.datasets import CocoDetection
+from torchvision import transforms
 
 # Start a new wandb run to track this script.
 run = wandb.init(
@@ -14,27 +17,10 @@ run = wandb.init(
     },
 )
 
-# Simulate training.
-epochs = 10
-offset = random.random() / 5
-for epoch in range(2, epochs):
-    acc = 1 - 2**-epoch - random.random() / epoch - offset
-    loss = 2**-epoch + random.random() / epoch + offset
-
-    # Log metrics to wandb.
-    run.log({"acc": acc, "loss": loss})
-
-
-run.finish()
-
-import torch
-from torch.utils.data import DataLoader
-from torchvision.datasets import CocoDetection
-from torchvision import transforms
-
 # Paths to dataset
-TRAIN_IMAGES_FOLDER = './archive/coco2017/train2017'
-TRAIN_ANNOTATIONS_FILE = './archive/coco2017/annotations/instances_train2017.json'
+TRAIN_IMAGES_FOLDER = 'C:\\Users\\styli\\Desktop\\dataset\\coco2017\\train2017' #/dataset/coco2017/train2017'
+TRAIN_ANNOTATIONS_FILE = 'C:\\Users\\styli\\Desktop\\dataset\\coco2017\\annotations\\instances_train2017.json'
+#/dataset/coco2017/annotations/instances_train2017.json
 
 coco_transform = transforms.Compose([transforms.ToTensor()])
 
@@ -51,6 +37,9 @@ class COCODataset(torch.utils.data.Dataset):
         if self.transform:
             image = self.transform(image)
         return image, target
+    
+def collate_fn(batch):
+    return tuple(zip(*batch))
 
 def get_train_loader(batch_size=2):
     dataset = COCODataset(
@@ -58,12 +47,6 @@ def get_train_loader(batch_size=2):
         annFile=TRAIN_ANNOTATIONS_FILE,
         transform=coco_transform
     )
-    return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+    return DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2,collate_fn=collate_fn)
 
-# Test 
-if __name__ == "__main__":
-    train_loader = get_train_loader(batch_size=2)
-    for images, targets in train_loader:
-        print("Batch of images shape:", images.shape)
-        print("Sample target:", targets[0])
-        break
+run.finish()

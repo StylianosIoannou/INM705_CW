@@ -1,0 +1,16 @@
+{"time":"2025-03-28T14:56:17.6775364Z","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"C:\\Users\\styli\\Desktop\\INM705_CW-2\\wandb\\run-20250328_145617-fsxzidde\\logs\\debug-core.log"}
+{"time":"2025-03-28T14:56:18.759847Z","level":"INFO","msg":"created new stream","id":"fsxzidde"}
+{"time":"2025-03-28T14:56:18.759847Z","level":"INFO","msg":"stream: started","id":"fsxzidde"}
+{"time":"2025-03-28T14:56:18.759847Z","level":"INFO","msg":"writer: Do: started","stream_id":"fsxzidde"}
+{"time":"2025-03-28T14:56:18.7605277Z","level":"INFO","msg":"handler: started","stream_id":"fsxzidde"}
+{"time":"2025-03-28T14:56:18.76088Z","level":"INFO","msg":"sender: started","stream_id":"fsxzidde"}
+{"time":"2025-03-28T14:56:19.0745455Z","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-03-28T14:56:19.127537Z","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-03-28T14:56:19.1296586Z","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-03-28T14:56:20.1320955Z","level":"INFO","msg":"handler: operation stats","stats":{"operations":[{"desc":"uploading output.log","runtime_seconds":0.0081508},{"desc":"uploading wandb-summary.json","runtime_seconds":0.0081508,"progress":"141B/141B"}],"total_operations":2}}
+{"time":"2025-03-28T14:56:20.6755531Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-03-28T14:56:20.9070852Z","level":"INFO","msg":"stream: closing","id":"fsxzidde"}
+{"time":"2025-03-28T14:56:20.9070852Z","level":"INFO","msg":"handler: closed","stream_id":"fsxzidde"}
+{"time":"2025-03-28T14:56:20.9070852Z","level":"INFO","msg":"writer: Close: closed","stream_id":"fsxzidde"}
+{"time":"2025-03-28T14:56:20.9070852Z","level":"INFO","msg":"sender: closed","stream_id":"fsxzidde"}
+{"time":"2025-03-28T14:56:20.9070852Z","level":"INFO","msg":"stream: closed","id":"fsxzidde"}

@@ -1,0 +1,40 @@
+{
+  "os":  "Windows-10-10.0.26100-SP0",
+  "python":  "CPython 3.11.9",
+  "startedAt":  "2025-03-28T14:43:22.157813Z",
+  "program":  "<python with no main file>",
+  "git":  {
+    "remote":  "https://github.com/StylianosIoannou/INM705_CW.git",
+    "commit":  "eff0bebec968ee923e9899464921a16cc7c16443"
+  },
+  "email":  "stylianos.ioannou@city.ac.uk",
+  "root":  "C:\\Users\\styli\\Desktop\\INM705_CW-2",
+  "host":  "MSI",
+  "executable":  "C:\\Users\\styli\\Desktop\\INM705_CW-2\\venv\\Scripts\\python.exe",
+  "cpu_count":  16,
+  "cpu_count_logical":  22,
+  "gpu":  "NVIDIA GeForce RTX 4070 Laptop GPU",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "995445698560",
+      "used":  "205316554752"
+    }
+  },
+  "memory":  {
+    "total":  "33912606720"
+  },
+  "cpu":  {
+    "count":  16,
+    "countLogical":  22
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 4070 Laptop GPU",
+      "memoryTotal":  "8585740288",
+      "cudaCores":  4608,
+      "architecture":  "Ada"
+    }
+  ],
+  "cudaVersion":  "12.7"
+}
