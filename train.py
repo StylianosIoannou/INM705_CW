@@ -15,6 +15,7 @@ run = wandb.init(
         "dataset": "CIFAR-100",
         "epochs": 10,
     },
+    mode= "disabled"
 )
 
 # Paths to dataset
