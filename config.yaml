@@ -1,0 +1,17 @@
+data_settings:
+  train_image_dir: "C:\\Users\\styli\\Desktop\\dataset\\coco2017\\train2017"
+  val_image_dir: "C:\\Users\\styli\\Desktop\\dataset\\coco2017\\val2017"
+  train_annotation_file: "C:\\Users\\styli\\Desktop\\dataset\\coco2017\\annotations\\instances_train2017.json"
+  val_annotation_file: "C:\\Users\\styli\\Desktop\\dataset\\coco2017\\annotations\\instances_val2017.json"
+  num_classes: 91  # COCO: 90 object classes + background
+
+model:
+  rpn_pre_nms_top_n_train: 400
+  rpn_post_nms_top_n_train: 200
+  rpn_batch_size_per_image: 128
+  box_batch_size_per_image: 128
+
+train:
+  epochs: 10
+  batch_size: 2
+  learning_rate: 0.0001

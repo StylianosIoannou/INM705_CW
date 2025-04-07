@@ -1,7 +1,8 @@
 torch
 torchvision
 wandb
-opencv-python
+pyyaml
 matplotlib
 pycocotools
+Pillow
 
