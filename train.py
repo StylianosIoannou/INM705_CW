@@ -4,6 +4,11 @@ import yaml
 from torch.utils.data import DataLoader
 from Model import faster_rcnn_model as get_model
 from dataset import get_coco_dataset
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_recall_curve, f1_score, average_precision_score
+from pycocotools.cocoeval import COCOeval
+from pycocotools.coco import COCO
+import numpy as np  
 
 def read_config(config_path="config.yaml"):
     with open(config_path, "r") as f:
@@ -27,7 +32,7 @@ def convert_targets(targets):
             for ann in ann_list:
                 x, y, w, h = ann["bbox"]
                 if w <= 0 or h <= 0:
-                    continue  #Skip invalid bounding boxes
+                    continue
                 boxes.append([x, y, x + w, y + h])
                 labels.append(ann["category_id"])
             if len(boxes) == 0:
@@ -41,6 +46,84 @@ def convert_targets(targets):
                 "labels": labels
             })
     return new_targets
+
+
+def evaluate(model, val_loader, device, coco_gt):
+    model.eval()
+    coco_results = []
+    all_targets = []
+    all_preds = []
+
+    with torch.no_grad():
+        for images, targets in val_loader:
+            images = [img.to(device) for img in images]
+            outputs = model(images)
+
+            for i, output in enumerate(outputs):
+                target_list = targets[i]
+                if len(target_list) == 0:
+                    continue  # Skip images with no ground truth annotations
+
+                image_id = target_list[0]['image_id']
+                gt_labels = [ann["category_id"] for ann in target_list]
+
+                boxes = output['boxes'].cpu().numpy()
+                scores = output['scores'].cpu().numpy()
+                labels = output['labels'].cpu().numpy()
+
+                # COCO format detection logging
+                for box, score, label in zip(boxes, scores, labels):
+                    x1, y1, x2, y2 = box
+                    coco_box = [x1, y1, x2 - x1, y2 - y1]
+                    coco_results.append({
+                        "image_id": image_id,
+                        "category_id": int(label),
+                        "bbox": coco_box,
+                        "score": float(score)
+                    })
+
+                # Match number of predictions to number of GT labels (rough metric)
+                n = min(len(gt_labels), len(labels))
+                all_targets.extend(gt_labels[:n])
+                all_preds.extend(labels[:n])
+
+    if not coco_results:
+        print("No detections to evaluate.")
+        return 0.0, 0.0, 0.0
+
+    coco_dt = coco_gt.loadRes(coco_results)
+    coco_eval = COCOeval(coco_gt, coco_dt, iouType='bbox')
+    coco_eval.evaluate()
+    coco_eval.accumulate()
+    coco_eval.summarize()
+
+    mAP = coco_eval.stats[0]
+
+    # Convert lists to numpy arrays
+    all_targets_np = np.array(all_targets)
+    all_preds_np = np.array(all_preds)
+
+    # Reshape arrays to 2D if necessary
+    if all_targets_np.ndim == 1:
+        all_targets_np = all_targets_np.reshape(-1, 1)
+    if all_preds_np.ndim == 1:
+        all_preds_np = all_preds_np.reshape(-1, 1)
+
+    ap = average_precision_score(all_targets_np, all_preds_np, average='macro')
+    f1 = f1_score(all_targets_np, all_preds_np, average='macro')
+
+    precision, recall, _ = precision_recall_curve(all_targets_np.ravel(), all_preds_np.ravel(), pos_label=1)
+    pr_fig = plt.figure()
+    plt.plot(recall, precision, marker='.')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve')
+    wandb.log({"precision_recall_curve": wandb.Image(pr_fig)})
+    plt.close(pr_fig)
+
+    return ap, f1, mAP
+
+
 
 def train():
     config = read_config()
@@ -62,6 +145,12 @@ def train():
         data_settings["train_annotation_file"],
         train=True
     )
+    val_dataset = get_coco_dataset(
+        data_settings["val_image_dir"],
+        data_settings["val_annotation_file"],
+        train=False
+    )
+
     train_loader = DataLoader(
         train_dataset,
         batch_size=train_settings["batch_size"],
@@ -69,6 +158,16 @@ def train():
         num_workers=2,
         collate_fn=collate_fn
     )
+    val_loader = DataLoader(
+        val_dataset,
+        batch_size=1,
+        shuffle=False,
+        num_workers=2,
+        collate_fn=collate_fn
+    )
+
+     # Print the size of the validation dataset
+    print(f"Validation dataset size: {len(val_loader.dataset)}")
 
     num_classes = data_settings["num_classes"]
     model = get_model(num_classes)
@@ -77,6 +176,7 @@ def train():
 
     optimizer = torch.optim.Adam(model.parameters(), lr=train_settings["learning_rate"])
     num_epochs = train_settings["epochs"]
+    coco_gt = COCO(data_settings["val_annotation_file"])
 
     for epoch in range(num_epochs):
         model.train()
@@ -100,7 +200,18 @@ def train():
         torch.save(model.state_dict(), checkpoint_path)
         print(f"Saved checkpoint: {checkpoint_path}")
 
-        run.log({"epoch": epoch+1, "train_loss": avg_loss})
+        print("Evaluating after epoch...")
+        ap, f1, mAP = evaluate(model, val_loader, device, coco_gt)
+        print(f"Average Precision: {ap}, F1 Score: {f1}, mAP: {mAP}")
+
+        print(f"Logging metrics to WandB: Epoch {epoch+1}, AP: {ap}, F1: {f1}, mAP: {mAP}")
+        run.log({
+            "epoch": epoch+1,
+            "train_loss": avg_loss,
+            "Average_Precision": ap,
+            "F1_Score": f1,
+            "mAP": mAP,
+        })
 
     run.finish()
 

@@ -12,6 +12,6 @@ model:
   box_batch_size_per_image: 128
 
 train:
-  epochs: 10
+  epochs: 3
   batch_size: 2
   learning_rate: 0.0001

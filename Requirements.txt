@@ -5,4 +5,4 @@ pyyaml
 matplotlib
 pycocotools
 Pillow
-
+scikit-learn
