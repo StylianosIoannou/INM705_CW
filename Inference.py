@@ -39,8 +39,8 @@ def visualize_prediction(image, prediction, threshold=0.5, save_path="inference_
     print(f"Inference result saved to: {save_path}")
 
 if __name__ == "__main__":
-    image_path = "/users/adgs899/archive/dataset/coco2017/val2017/000000000632.jpg"
-    checkpoint_path = "model_checkpoint_epoch_2.pth"
+    image_path = "/users/adgs899/archive/dataset/coco2017/val2017/000000000139.jpg"
+    checkpoint_path = "model_checkpoint_epoch_4.pth"
     num_classes = 91
 
     image, prediction = run_inference(image_path, checkpoint_path, num_classes)

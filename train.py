@@ -132,7 +132,7 @@ def train():
 
     run = wandb.init(
         entity="stylianos-ioannou-city-university-of-london",
-        project="INM705_CW",
+        project="INM705_CW_CBAM",
         config={
             "learning_rate": train_settings["learning_rate"],
             "epochs": train_settings["epochs"],
