@@ -10,14 +10,17 @@ from pycocotools.cocoeval import COCOeval
 from pycocotools.coco import COCO
 import numpy as np  
 
+# Load training configuration from config.yaml
 def read_config(config_path="config.yaml"):
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
     return config
 
+# Required for batching variable-length targets
 def collate_fn(batch):
     return tuple(zip(*batch))
 
+# Convert COCO-style targets to the format expected by Faster R-CNN
 def convert_targets(targets):
     new_targets = []
     for ann_list in targets:
@@ -48,6 +51,7 @@ def convert_targets(targets):
     return new_targets
 
 
+# Evaluation function using COCO metrics and logging PR curve to wandb
 def evaluate(model, val_loader, device, coco_gt):
     model.eval()
     coco_results = []
@@ -71,7 +75,7 @@ def evaluate(model, val_loader, device, coco_gt):
                 scores = output['scores'].cpu().numpy()
                 labels = output['labels'].cpu().numpy()
 
-                # COCO format detection logging
+                # Convert to COCO format
                 for box, score, label in zip(boxes, scores, labels):
                     x1, y1, x2, y2 = box
                     coco_box = [x1, y1, x2 - x1, y2 - y1]
@@ -82,7 +86,6 @@ def evaluate(model, val_loader, device, coco_gt):
                         "score": float(score)
                     })
 
-                # Match number of predictions to number of GT labels (rough metric)
                 n = min(len(gt_labels), len(labels))
                 all_targets.extend(gt_labels[:n])
                 all_preds.extend(labels[:n])
@@ -90,7 +93,8 @@ def evaluate(model, val_loader, device, coco_gt):
     if not coco_results:
         print("No detections to evaluate.")
         return 0.0, 0.0, 0.0
-
+    
+    # Run COCO evaluation
     coco_dt = coco_gt.loadRes(coco_results)
     coco_eval = COCOeval(coco_gt, coco_dt, iouType='bbox')
     coco_eval.evaluate()
@@ -124,12 +128,13 @@ def evaluate(model, val_loader, device, coco_gt):
     return ap, f1, mAP
 
 
-
+# Main training loop
 def train():
     config = read_config()
     data_settings = config["data_settings"]
     train_settings = config["train"]
 
+# Initialize Weights & Biases
     run = wandb.init(
         entity="stylianos-ioannou-city-university-of-london",
         project="INM705_CW_CBAM",
@@ -178,6 +183,7 @@ def train():
     num_epochs = train_settings["epochs"]
     coco_gt = COCO(data_settings["val_annotation_file"])
 
+     # Train for each epoch
     for epoch in range(num_epochs):
         model.train()
         running_loss = 0.0
@@ -196,14 +202,17 @@ def train():
         avg_loss = running_loss / len(train_loader)
         print(f"Epoch {epoch+1}/{num_epochs}, Train Loss: {avg_loss:.4f}")
 
+        # Save model checkpoint
         checkpoint_path = f"model_checkpoint_epoch_{epoch+1}.pth"
         torch.save(model.state_dict(), checkpoint_path)
         print(f"Saved checkpoint: {checkpoint_path}")
 
+         # Evaluate on validation set
         print("Evaluating after epoch...")
         ap, f1, mAP = evaluate(model, val_loader, device, coco_gt)
         print(f"Average Precision: {ap}, F1 Score: {f1}, mAP: {mAP}")
 
+        # Log metrics to WandB
         print(f"Logging metrics to WandB: Epoch {epoch+1}, AP: {ap}, F1: {f1}, mAP: {mAP}")
         run.log({
             "epoch": epoch+1,
